@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mid-Autumn Festival</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b1d3a;
+            color: #333;
+            margin: 0;
+            padding: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 20px;
+        }
+        
+        /* 主選單樣式 */
+        #main-menu {
+            text-align: center;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            padding: 50px 30px;
+            border-top: 6px solid #f1c40f;
+            animation: fadeIn 0.5s ease-in-out;
+            max-width: 600px;
+            margin: 50px auto;
+        }
+        #main-menu h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .menu-btn {
+            display: block;
+            width: 100%;
+            max-width: 400px;
+            margin: 15px auto;
+            padding: 15px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: white;
+            background: #3498db;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .menu-btn:hover { background: #2980b9; transform: translateY(-2px); }
+        .menu-btn.fib { background: #1abc9c; }
+        .menu-btn.fib:hover { background: #16a085; }
+        .menu-btn.vid { background: #e67e22; }
+        .menu-btn.vid:hover { background: #d35400; }
+
+        /* 導覽列與進度條 */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .nav-left, .nav-right {
+            display: flex;
+            gap: 10px;
+        }
+        .nav-btn {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        .nav-btn:hover { background: #bdc3c7; }
+        .nav-btn.game-btn { background: #9b59b6; color: white; }
+        .nav-btn.game-btn:hover { background: #8e44ad; }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            border-radius: 10px;
+            height: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            background: #f1c40f;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        /* 幻燈片共用樣式 */
+        .slide {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            padding: 40px;
+            border-top: 6px solid #3498db;
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            min-height: 300px;
+            position: relative;
+        }
+        .slide.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .question-text {
+            font-size: 1.3em;
+            color: #2980b9;
+            font-weight: bold;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        
+        /* 選擇題 */
+        .options { list-style-type: none; padding: 0; }
+        .options li {
+            margin: 12px 0; padding: 15px;
+            background: #f8f9fa; border: 2px solid #e0e0e0;
+            border-radius: 8px; cursor: pointer;
+            font-size: 1.1em; transition: 0.2s;
+        }
+        .options li:hover { background: #e9ecef; }
+        .options li.correct {
+            background: #d4edda; border-color: #28a745;
+            color: #155724; pointer-events: none;
+        }
+        .options li.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+
+        /* 填空題 */
+        .blank-input {
+            width: 60px; padding: 5px; border: none; border-bottom: 3px solid #333;
+            text-align: center; font-weight: bold; font-size: 1.1em; color: #333;
+            background: #f9f9f9; outline: none; transition: 0.3s; margin: 0 5px;
+        }
+        .blank-input:focus { border-bottom-color: #3498db; }
+        .blank-input.correct { color: #28a745; border-bottom-color: #28a745; pointer-events: none; }
+        .blank-input.wrong { color: #dc3545; border-bottom-color: #dc3545; }
+
+        /* 影片與共用按鈕 */
+        .video-container {
+            position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;
+            border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-bottom: 20px;
+        }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .action-btn {
+            background: #3498db; color: white; border: none; padding: 12px 25px;
+            border-radius: 6px; cursor: pointer; font-size: 1.1em; margin-top: 20px;
+            display: block; width: 100%; text-align: center; transition: 0.2s;
+        }
+        .action-btn:hover { background: #2980b9; }
+        .success-msg {
+            color: #28a745; font-weight: bold; text-align: center; margin-top: 15px; display: none;
+        }
+        .answer-text {
+            font-size: 1.2em; color: #16a085; font-weight: bold; margin-top: 15px;
+            padding: 15px; background: #e8f8f5; border-radius: 8px; display: none;
+        }
+
+        /* 彈出視窗 (Modal) 背景 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none; /* 預設隱藏 */
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        /* 彈出視窗內容 (踩地雷區塊) */
+        .modal-content {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            padding: 25px;
+            width: 90%;
+            max-width: 380px;
+            position: relative;
+            border-top: 6px solid #9b59b6;
+            animation: popIn 0.3s ease;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 15px;
+            font-size: 1.5em;
+            background: none; border: none;
+            color: #95a5a6; cursor: pointer;
+            transition: 0.2s;
+        }
+        .close-btn:hover { color: #e74c3c; }
+
+        /* 踩地雷遊戲專用樣式 */
+        .ms-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .minesweeper-board {
+            display: grid;
+            gap: 2px;
+            justify-content: center;
+            background: #7f8c8d;
+            padding: 4px;
+            border-radius: 4px;
+            margin: 0 auto;
+            width: fit-content;
+        }
+        .ms-cell {
+            width: 32px; height: 32px;
+            background-color: #bdc3c7;
+            border: 2px solid;
+            border-color: #ecf0f1 #95a5a6 #95a5a6 #ecf0f1;
+            display: flex; justify-content: center; align-items: center;
+            font-weight: bold; font-size: 1.1em;
+            cursor: pointer; user-select: none; box-sizing: border-box;
+        }
+        .ms-cell.revealed { background-color: #ecf0f1; border: 1px solid #bdc3c7; }
+        .ms-cell.bomb { background-color: #e74c3c; color: white; border-color: #c0392b; }
+        
+        .ms-controls {
+            display: flex; justify-content: center; margin-top: 15px;
+        }
+        .ms-btn {
+            background: #34495e; color: white; border: none; padding: 10px 20px; width: 100%;
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s;
+        }
+        .ms-btn:hover { background: #2c3e50; }
+
+        /* 記分板樣式 */
+        .scoreboards {
+            margin-top: 20px;
+            border-top: 2px dashed #e0e0e0;
+            padding-top: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .score-board {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #ecf0f1; padding: 8px 15px; border-radius: 8px;
+            font-weight: bold; color: #2c3e50;
+        }
+        .score-ctrl { display: flex; align-items: center; gap: 10px; }
+        .score-btn {
+            background: #3498db; color: white; border: none;
+            width: 28px; height: 28px; border-radius: 4px;
+            font-weight: bold; font-size: 1.1em; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .score-btn:hover { background: #2980b9; }
+        .score-btn.minus { background: #e74c3c; }
+        .score-btn.minus:hover { background: #c0392b; }
+        .score-val { font-size: 1.2em; width: 30px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <!-- ================= 主選單 ================= -->
+        <div id="main-menu">
+            <h1>🌕Mid-Autumn Festival</h1>
+            <button class="menu-btn" onclick="startSection('mcq')">Multiple Choice</button>
+            <button class="menu-btn fib" onclick="startSection('fib')">Fill in the Blanks</button>
+            <button class="menu-btn vid" onclick="startSection('video')">Video & Q&A</button>
+        </div>
+
+        <!-- ================= 學習區 (預設隱藏) ================= -->
+        <div id="learning-area" style="display: none;">
+            
+            <div class="top-nav">
+                <div class="nav-left">
+                    <button class="nav-btn" id="prev-btn" onclick="prevSlide()">⬅ 上一題</button>
+                    <button class="nav-btn" id="next-btn" onclick="nextSlide()">下一題 ➡</button>
+                </div>
+                <div class="nav-right">
+                    <button class="nav-btn game-btn" onclick="openGameModal()">🎮 Game</button>
+                    <button class="nav-btn" onclick="backToMenu()">🏠Home</button>
+                </div>
+            </div>
+            
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+
+            <!-- 【選擇題區塊】 -->
+            <div class="slide mcq">
+                <div class="question-text">Q1 Multiple Choice:<br>4. What food is usually eaten in the Mid-Autumn Festival?</div>
+                <ul class="options">
+                    <li onclick="checkMCQ(this, false)">(1) The sticky rice dumpling</li>
+                    <li onclick="checkMCQ(this, true)">(2) The moon cake</li>
+                    <li onclick="checkMCQ(this, false)">(3) The sugar cane</li>
+                </ul>
+                <div class="success-msg">Next</div>
+            </div>
+            <div class="slide mcq">
+                <div class="question-text">Q2 Multiple Choice:<br>5. What date is the moon the roundest and brightest in the lunar calendar?</div>
+                <ul class="options">
+                    <li onclick="checkMCQ(this, false)">(1) The first</li>
+                    <li onclick="checkMCQ(this, true)">(2) The fifteenth</li>
+                    <li onclick="checkMCQ(this, false)">(3) The twentieth</li>
+                    <li onclick="checkMCQ(this, false)">(4) The thirtieth</li>
+                </ul>
+                <div class="success-msg">Finish</div>
+            </div>
+
+            <!-- 【填空題區塊】 -->
+            <div class="slide fib">
+                <div class="question-text">Q1 Fill in the Blanks:<br>請在框內輸入正確的單字</div>
+                <p style="font-size: 1.3em;">1. August 15th, <input type="text" class="blank-input" data-answer="in"> the lunar calendar, is the Mid-Autumn Festival.</p>
+                <div class="success-msg">Next</div>
+            </div>
+            <div class="slide fib">
+                <div class="question-text">Q2 Fill in the Blanks:<br>請填入三個正確單字</div>
+                <p style="font-size: 1.3em; line-height: 2;">
+                    2. I was <input type="text" class="blank-input" data-answer="so"> excited. I <input type="text" class="blank-input" data-answer="not"> only ate moon cakes, <input type="text" class="blank-input" data-answer="but"> also wanted to enjoy the beautiful moon.
+                </p>
+                <div class="success-msg">Next</div>
+            </div>
+            <div class="slide fib">
+                <div class="question-text">Q3 Fill in the Blanks:</div>
+                <p style="font-size: 1.3em;">3. I planned <input type="text" class="blank-input" data-answer="to"> have a happy Mid-Autumn Festival.</p>
+                <div class="success-msg">Next</div>
+            </div>
+            <div class="slide fib">
+                <div class="question-text">Q4 Fill in the Blanks:</div>
+                <p style="font-size: 1.3em;">4. Ding, Ding. The bell rang; someone came <input type="text" class="blank-input" data-answer="to"> the door.</p>
+                <div class="success-msg">Next</div>
+            </div>
+            <div class="slide fib">
+                <div class="question-text">Q5 Fill in the Blanks:</div>
+                <p style="font-size: 1.3em;">5. <input type="text" class="blank-input" data-answer="at"> eight in the evening, my family went onto the balcony and watched the moon.</p>
+                <div class="success-msg">Next</div>
+            </div>
+
+            <!-- 【影片與問答區塊】 -->
+            <div class="slide video">
+                <div class="question-text">Watch the Video</div>
+                <div class="video-container">
+                    <iframe id="yt-video" src="https://www.youtube.com/embed/3YBlTGEumCM?si=DxQFHJGOqzSPXThG" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+                <button class="action-btn" onclick="nextSlide()">Finish</button>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q1:<br>What did Hou Yi shoot down from the sky?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A1: Nine suns.</div>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q2:<br>Who ate the special pill and floated up to the moon?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A2: Chang'e.</div>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q3:<br>When is the Moon Festival celebrated on the lunar calendar?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A3: 15th day of the 8th month.</div>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q4:<br>What is another name for the Moon Festival?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A4: Mid-Autumn Festival.</div>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q5:<br>What is the most popular gift to give during the Moon Festival?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A5: Moon cakes.</div>
+            </div>
+            <div class="slide video">
+                <div class="question-text">Video Q6:<br>What do children often carry when they go on walks to join the festivities?</div>
+                <button class="action-btn show-ans-btn" onclick="showAnswer(this)">Answer</button>
+                <div class="answer-text">A6: Lanterns.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= 彈出視窗：踩地雷遊戲 ================= -->
+    <div id="game-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGameModal()">✖</button>
+            <div class="question-text" style="text-align:center; margin-bottom: 15px; margin-top: 5px;">game</div>
+            
+            <div class="ms-header">
+                <span id="ms-mines-count">💣 Mines: 10</span>
+                <span id="ms-status">遊戲進行中...</span>
+            </div>
+            
+            <div id="minesweeper-board" class="minesweeper-board"></div>
+            
+            <div class="ms-controls">
+                <button class="ms-btn" onclick="initMinesweeper()">🔄 Restart</button>
+            </div>
+
+            <!-- 三個獨立記分板 -->
+            <div class="scoreboards">
+                <div class="score-board">
+                    <span>grape</span>
+                    <div class="score-ctrl">
+                        <button class="score-btn minus" onclick="changeScore(0, -1)">-</button>
+                        <span class="score-val" id="score-0">0</span>
+                        <button class="score-btn" onclick="changeScore(0, 1)">+</button>
+                    </div>
+                </div>
+                <div class="score-board">
+                    <span>peach</span>
+                    <div class="score-ctrl">
+                        <button class="score-btn minus" onclick="changeScore(1, -1)">-</button>
+                        <span class="score-val" id="score-1">0</span>
+                        <button class="score-btn" onclick="changeScore(1, 1)">+</button>
+                    </div>
+                </div>
+                <div class="score-board">
+                    <span>kiwi</span>
+                    <div class="score-ctrl">
+                        <button class="score-btn minus" onclick="changeScore(2, -1)">-</button>
+                        <span class="score-val" id="score-2">0</span>
+                        <button class="score-btn" onclick="changeScore(2, 1)">+</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSectionSlides = [];
+        let currentIndex = 0;
+        let isTransitioning = false; 
+
+        // 啟動單元
+        function startSection(sectionClass) {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('learning-area').style.display = 'block';
+            
+            currentSectionSlides = Array.from(document.querySelectorAll('.slide.' + sectionClass));
+            
+            currentIndex = 0;
+            resetSectionState();
+            showCurrentSlide();
+        }
+
+        // 顯示當前題目
+        function showCurrentSlide() {
+            isTransitioning = false;
+            document.querySelectorAll('.slide').forEach(s => {
+                s.classList.remove('active');
+                const msg = s.querySelector('.success-msg');
+                if (msg) msg.style.display = 'none';
+            });
+            
+            if (currentSectionSlides[currentIndex]) {
+                currentSectionSlides[currentIndex].classList.add('active');
+            }
+
+            // 控制「上一題」與「下一題」按鈕
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+
+            if (currentIndex === 0) {
+                prevBtn.style.visibility = 'hidden';
+            } else {
+                prevBtn.style.visibility = 'visible';
+            }
+
+            if (currentIndex === currentSectionSlides.length - 1) {
+                nextBtn.style.visibility = 'hidden';
+            } else {
+                nextBtn.style.visibility = 'visible';
+            }
+
+            // 更新進度條
+            const maxIdx = Math.max(1, currentSectionSlides.length - 1);
+            const percent = (currentIndex / maxIdx) * 100; 
+            document.getElementById('progress').style.width = Math.min(percent, 100) + '%';
+        }
+
+        function nextSlide() {
+            if (currentIndex < currentSectionSlides.length - 1) {
+                currentIndex++;
+                showCurrentSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentIndex > 0 && !isTransitioning) {
+                currentIndex--;
+                showCurrentSlide();
+            }
+        }
+
+        function backToMenu() {
+            const iframe = document.getElementById('yt-video');
+            if(iframe) iframe.src = iframe.src;
+
+            document.getElementById('main-menu').style.display = 'block';
+            document.getElementById('learning-area').style.display = 'none';
+        }
+
+        function resetSectionState() {
+            document.querySelectorAll('.options li').forEach(li => {
+                li.classList.remove('correct', 'wrong');
+                li.style.pointerEvents = 'auto';
+            });
+            document.querySelectorAll('.blank-input').forEach(input => {
+                input.value = '';
+                input.classList.remove('correct', 'wrong');
+                input.style.pointerEvents = 'auto';
+            });
+            document.querySelectorAll('.answer-text').forEach(ans => {
+                ans.style.display = 'none';
+            });
+            document.querySelectorAll('.show-ans-btn').forEach(btn => {
+                btn.innerText = 'Answer';
+                btn.style.background = '#3498db';
+            });
+        }
+
+        // ================ 題目區邏輯 ================
+        function checkMCQ(element, isCorrect) {
+            if (isTransitioning) return;
+            const parent = element.parentElement;
+            const options = parent.querySelectorAll('li');
+            
+            if (isCorrect) {
+                element.classList.add('correct');
+                parent.parentElement.querySelector('.success-msg').style.display = 'block';
+                options.forEach(opt => opt.style.pointerEvents = 'none');
+                
+                isTransitioning = true;
+                setTimeout(nextSlide, 1500);
+            } else {
+                element.classList.add('wrong');
+                setTimeout(() => element.classList.remove('wrong'), 800);
+            }
+        }
+
+        const fibSlides = document.querySelectorAll('.slide.fib');
+        fibSlides.forEach(slide => {
+            const inputs = slide.querySelectorAll('.blank-input');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    if (isTransitioning) return;
+                    
+                    const correctAns = this.getAttribute('data-answer').toLowerCase();
+                    const userVal = this.value.trim().toLowerCase();
+                    
+                    if (userVal === correctAns) {
+                        this.classList.add('correct');
+                        this.classList.remove('wrong');
+                    } else {
+                        this.classList.remove('correct');
+                        if(userVal.length >= correctAns.length) {
+                            this.classList.add('wrong');
+                        } else {
+                            this.classList.remove('wrong');
+                        }
+                    }
+                    
+                    let allCorrect = true;
+                    inputs.forEach(inp => {
+                        if (!inp.classList.contains('correct')) {
+                            allCorrect = false;
+                        }
+                    });
+
+                    if (allCorrect) {
+                        slide.querySelector('.success-msg').style.display = 'block';
+                        isTransitioning = true;
+                        setTimeout(nextSlide, 1500);
+                    }
+                });
+            });
+        });
+
+        function showAnswer(btn) {
+            const ansDiv = btn.nextElementSibling;
+            if (ansDiv.style.display !== 'block') {
+                ansDiv.style.display = 'block';
+                btn.innerText = 'Next';
+                btn.style.background = '#e74c3c';
+            } else {
+                nextSlide();
+            }
+        }
+
+        // ================ Modal 視窗邏輯 ================
+        function openGameModal() {
+            document.getElementById('game-modal').style.display = 'flex';
+            if (msGrid.length === 0) {
+                initMinesweeper();
+            }
+        }
+
+        function closeGameModal() {
+            document.getElementById('game-modal').style.display = 'none';
+        }
+
+        // ================ 記分板邏輯 ================
+        let globalScores = [0, 0, 0];
+        
+        function changeScore(playerIndex, amount) {
+            globalScores[playerIndex] += amount;
+            document.getElementById(`score-${playerIndex}`).innerText = globalScores[playerIndex];
+        }
+
+        // ================ 踩地雷遊戲邏輯 ================
+        const msRows = 8;
+        const msCols = 8;
+        const msBombsCount = 10;
+        let msGrid = [];
+        let msGameOver = false;
+        let msCellsRevealed = 0;
+
+        function initMinesweeper() {
+            msGrid = [];
+            msGameOver = false;
+            msCellsRevealed = 0;
+            
+            document.getElementById('ms-status').innerText = '遊戲進行中...';
+            document.getElementById('ms-status').style.color = '#333';
+            
+            const board = document.getElementById('minesweeper-board');
+            board.innerHTML = '';
+            board.style.gridTemplateColumns = `repeat(${msCols}, 32px)`;
+
+            // 建立空資料陣列
+            for (let r = 0; r < msRows; r++) {
+                let row = [];
+                for (let c = 0; c < msCols; c++) {
+                    row.push({
+                        r: r, c: c, isBomb: false, revealed: false, neighborCount: 0
+                    });
+                }
+                msGrid.push(row);
+            }
+
+            // 隨機放置地雷
+            let bombsPlaced = 0;
+            while (bombsPlaced < msBombsCount) {
+                let r = Math.floor(Math.random() * msRows);
+                let c = Math.floor(Math.random() * msCols);
+                if (!msGrid[r][c].isBomb) {
+                    msGrid[r][c].isBomb = true;
+                    bombsPlaced++;
+                }
+            }
+
+            // 計算周圍地雷數量
+            for (let r = 0; r < msRows; r++) {
+                for (let c = 0; c < msCols; c++) {
+                    if (!msGrid[r][c].isBomb) {
+                        let count = 0;
+                        for (let dr = -1; dr <= 1; dr++) {
+                            for (let dc = -1; dc <= 1; dc++) {
+                                let nr = r + dr, nc = c + dc;
+                                if (nr >= 0 && nr < msRows && nc >= 0 && nc < msCols && msGrid[nr][nc].isBomb) {
+                                    count++;
+                                }
+                            }
+                        }
+                        msGrid[r][c].neighborCount = count;
+                    }
+                }
+            }
+
+            // 渲染畫面
+            for (let r = 0; r < msRows; r++) {
+                for (let c = 0; c < msCols; c++) {
+                    let cellDiv = document.createElement('div');
+                    cellDiv.className = 'ms-cell';
+                    cellDiv.id = `cell-${r}-${c}`;
+                    
+                    // 僅保留左鍵點擊
+                    cellDiv.addEventListener('click', () => msClickCell(r, c));
+                    
+                    board.appendChild(cellDiv);
+                }
+            }
+        }
+
+        function msClickCell(r, c) {
+            if (msGameOver) return;
+            const cell = msGrid[r][c];
+            if (cell.revealed) return;
+
+            if (cell.isBomb) {
+                msTriggerGameOver(false);
+            } else {
+                msRevealCell(r, c);
+                msCheckWin();
+            }
+        }
+
+        function msRevealCell(r, c) {
+            const cell = msGrid[r][c];
+            if (cell.revealed) return;
+
+            cell.revealed = true;
+            msCellsRevealed++;
+            
+            const div = document.getElementById(`cell-${r}-${c}`);
+            div.classList.add('revealed');
+            
+            if (cell.neighborCount > 0) {
+                div.innerText = cell.neighborCount;
+                const colors = ['', 'blue', 'green', 'red', 'purple', 'maroon', 'turquoise', 'black', 'gray'];
+                div.style.color = colors[cell.neighborCount];
+            } else {
+                // 如果周圍是0，遞迴展開
+                for (let dr = -1; dr <= 1; dr++) {
+                    for (let dc = -1; dc <= 1; dc++) {
+                        let nr = r + dr, nc = c + dc;
+                        if (nr >= 0 && nr < msRows && nc >= 0 && nc < msCols) {
+                            msRevealCell(nr, nc);
+                        }
+                    }
+                }
+            }
+        }
+
+        function msCheckWin() {
+            if (msCellsRevealed === (msRows * msCols - msBombsCount)) {
+                msTriggerGameOver(true);
+            }
+        }
+
+        function msTriggerGameOver(win) {
+            msGameOver = true;
+            const statusLabel = document.getElementById('ms-status');
+            
+            if (win) {
+                statusLabel.innerText = '🎉 You Win!';
+                statusLabel.style.color = '#27ae60';
+            } else {
+                statusLabel.innerText = '💥 Game Over!';
+                statusLabel.style.color = '#c0392b';
+            }
+
+            // 顯示所有地雷
+            for (let r = 0; r < msRows; r++) {
+                for (let c = 0; c < msCols; c++) {
+                    let cell = msGrid[r][c];
+                    let div = document.getElementById(`cell-${r}-${c}`);
+                    if (cell.isBomb) {
+                        div.innerText = '💣';
+                        div.classList.add('bomb');
+                        div.classList.add('revealed');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
