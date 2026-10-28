@@ -52,7 +52,7 @@
         
         /* 填空欄位設計 */
         input[type="text"] {
-            width: 120px; /* 稍微縮小寬度以適應句型長度 */
+            width: 120px; 
             border: none;
             border-bottom: 3px solid #999;
             background: #f9f9f9;
@@ -339,12 +339,13 @@
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
             <div class="image-board-container">
-                <img src="image_2e07c5.png" alt="reading p9 background" id="bg-img-p5">
+                <!-- 這裡已將底圖名稱改為 9.png -->
+                <img src="9.png" alt="reading p9 background" id="bg-img-p5">
                 <canvas id="part5Board"></canvas>
             </div>
         </div>
         
-        <!-- Part 6 (新增填空題) -->
+        <!-- Part 6 (填空題) -->
         <div class="quiz-part" id="part-6">
             <div class="section-title">Part six: reading p11</div>
             <ol>
@@ -568,7 +569,7 @@
 
             // --- 魚缸區與作答邏輯 ---
             let fishCount = 0;
-            const targetFish = 43; // 目標數量改為 43
+            const targetFish = 43; 
             const tank = document.getElementById('tank');
             const successMsg = document.getElementById('success-msg');
             const btnAdd = document.getElementById('btn-add');
