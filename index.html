@@ -17,6 +17,9 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             background-color: #f4f6f9;
+            /* 防止文字在畫圖時被意外反白選取 */
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         /* 左側題目區 */
@@ -28,7 +31,14 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            overflow-y: auto; /* 只允許左側區域上下捲動 */
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; /* 讓 iPad 滾動更滑順 */
+        }
+
+        /* 恢復輸入框的選取功能 */
+        input[type="text"] {
+            -webkit-user-select: text;
+            user-select: text;
         }
 
         .quiz-part {
@@ -56,7 +66,6 @@
             color: #2c3e50;
         }
         
-        /* 填空欄位設計 */
         input[type="text"] {
             width: 120px; 
             border: none;
@@ -81,7 +90,6 @@
             font-weight: bold;
         }
 
-        /* 底部切換按鈕區 */
         .nav-buttons {
             display: flex;
             justify-content: space-between;
@@ -102,18 +110,16 @@
         .nav-buttons button:hover { background: #1976d2; }
         .nav-buttons button:disabled { background: #ccc; cursor: not-allowed; }
 
-        /* 右側面板 */
         #side-area {
             flex: 4;
             display: flex;
             flex-direction: column;
             background: #fafafa;
-            min-width: 0; /* 防止子元素撐破父元素 */
+            min-width: 0; 
         }
 
-        /* 魚缸區 */
         #tank-container {
-            flex: 4; /* 佔據右側 40% 的高度 */
+            flex: 4; 
             position: relative;
             background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
             border-bottom: 3px solid #ccc;
@@ -177,13 +183,12 @@
             text-align: center;
         }
 
-        /* 筆記區 */
         #whiteboard-container {
-            flex: 6; /* 佔據右側 60% 的高度 */
+            flex: 6; 
             padding: 15px;
             display: flex;
             flex-direction: column;
-            min-height: 0; /* 關鍵：防止高度被畫布無限撐開 */
+            min-height: 0; 
         }
         .toolbar {
             margin-bottom: 10px;
@@ -207,13 +212,14 @@
             border-color: #1976d2;
         }
 
-        /* 畫布專屬外框 (用來限制 iPad 上的畫布尺寸亂跑) */
         .canvas-wrapper {
             position: relative;
             flex: 1;
             width: 100%;
             min-height: 0; 
         }
+        
+        /* 確保畫布支援多點觸控且不會滑動網頁 */
         .canvas-wrapper canvas {
             position: absolute;
             top: 0;
@@ -224,11 +230,10 @@
             background: #fff;
             cursor: crosshair;
             border-radius: 8px;
-            touch-action: none;
+            touch-action: none; /* 關鍵：禁止瀏覽器預設手勢 */
             box-sizing: border-box;
         }
         
-        /* Part 5 專屬圖片與畫布重疊容器 */
         .image-board-container {
             position: relative;
             width: 100%;
@@ -240,6 +245,7 @@
             display: block;
             border-radius: 8px;
             border: 1px solid #ccc;
+            pointer-events: none; /* 防止圖片干擾觸控 */
         }
         .image-board-container canvas {
             position: absolute;
@@ -255,9 +261,7 @@
 </head>
 <body>
 
-    <!-- 左側：題目區 -->
     <div id="quiz-area">
-        
         <!-- Part 0 -->
         <div class="quiz-part active" id="part-0">
             <div class="section-title">New Rules</div>
@@ -324,7 +328,6 @@
                 <button id="btn-clear-p3">清除此區手寫</button>
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
-            <!-- 使用 canvas-wrapper 防止亂跑 -->
             <div class="canvas-wrapper" style="height: 450px; flex: none; margin-bottom: 20px;">
                 <canvas id="part3Board"></canvas>
             </div>
@@ -382,7 +385,6 @@
             </ol>
         </div>
 
-        <!-- 切換按鈕 -->
         <div class="nav-buttons">
             <button id="btn-prev" disabled>上一部分</button>
             <button id="btn-next">下一部分</button>
@@ -408,7 +410,6 @@
                 <label style="font-size: 18px; margin-left: 10px;">顏色: <input type="color" id="penColor" value="#000000"></label>
                 <label style="font-size: 18px;">粗細: <input type="range" id="penSize" min="1" max="15" value="3"></label>
             </div>
-            <!-- 使用 canvas-wrapper 防止亂跑 -->
             <div class="canvas-wrapper">
                 <canvas id="drawingBoard"></canvas>
             </div>
@@ -418,7 +419,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 工具狀態管理 (畫筆 / 橡皮擦) ---
+            // --- 工具狀態管理 ---
             let currentDrawMode = 'pen';
             const btnPen = document.getElementById('btn-pen');
             const btnEraser = document.getElementById('btn-eraser');
@@ -445,32 +446,41 @@
                 const penSizeInput = document.getElementById('penSize');
                 let isDrawing = false;
 
+                function getEventPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    // 判斷是觸控事件還是滑鼠事件
+                    if (e.touches && e.touches.length > 0) {
+                        return {
+                            x: e.touches[0].clientX - rect.left,
+                            y: e.touches[0].clientY - rect.top
+                        };
+                    } else if (e.clientX !== undefined) {
+                        return {
+                            x: e.clientX - rect.left,
+                            y: e.clientY - rect.top
+                        };
+                    }
+                    return null;
+                }
+
                 function startDrawing(e) {
+                    // 防止螢幕在觸控時滑動
+                    if (e.cancelable) e.preventDefault(); 
                     isDrawing = true;
                     draw(e);
                 }
 
-                function stopDrawing() {
+                function stopDrawing(e) {
                     isDrawing = false;
                     ctx.beginPath();
                 }
 
                 function draw(e) {
                     if (!isDrawing) return;
-                    e.preventDefault(); 
+                    if (e.cancelable) e.preventDefault();
                     
-                    const rect = canvas.getBoundingClientRect();
-                    let x, y;
-                    
-                    if (e.clientX !== undefined) {
-                        x = e.clientX - rect.left;
-                        y = e.clientY - rect.top;
-                    } else if (e.touches && e.touches.length > 0) {
-                        x = e.touches[0].clientX - rect.left;
-                        y = e.touches[0].clientY - rect.top;
-                    } else {
-                        return;
-                    }
+                    const pos = getEventPos(e);
+                    if (!pos) return;
 
                     ctx.globalCompositeOperation = currentDrawMode === 'eraser' ? 'destination-out' : 'source-over';
                     ctx.lineWidth = currentDrawMode === 'eraser' ? parseInt(penSizeInput.value) * 2 : penSizeInput.value;
@@ -478,20 +488,23 @@
                     ctx.lineJoin = 'round';
                     ctx.strokeStyle = currentDrawMode === 'eraser' ? 'rgba(0,0,0,1)' : penColorInput.value;
 
-                    ctx.lineTo(x, y);
+                    ctx.lineTo(pos.x, pos.y);
                     ctx.stroke();
                     ctx.beginPath();
-                    ctx.moveTo(x, y);
+                    ctx.moveTo(pos.x, pos.y);
                 }
 
+                // 註冊滑鼠事件
                 canvas.addEventListener('mousedown', startDrawing);
                 canvas.addEventListener('mouseup', stopDrawing);
                 canvas.addEventListener('mouseout', stopDrawing);
                 canvas.addEventListener('mousemove', draw);
 
-                canvas.addEventListener('touchstart', (e) => { startDrawing(e.touches[0]); }, { passive: false });
+                // 註冊觸控事件 (傳入完整的 Event 物件而非 touch[0])
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
                 canvas.addEventListener('touchend', stopDrawing);
-                canvas.addEventListener('touchmove', (e) => { draw(e.touches[0]); e.preventDefault(); }, { passive: false });
+                canvas.addEventListener('touchcancel', stopDrawing);
+                canvas.addEventListener('touchmove', draw, { passive: false });
 
                 if (btnClear) {
                     btnClear.addEventListener('click', () => {
@@ -501,12 +514,10 @@
                 return canvas;
             }
 
-            // 初始化三個白板
             const canvasMain = setupCanvas('drawingBoard', 'btn-clear');
             const canvasP3 = setupCanvas('part3Board', 'btn-clear-p3');
             const canvasP5 = setupCanvas('part5Board', 'btn-clear-p5');
 
-            // 安全重置畫布大小，保留已畫內容
             function resizeCanvasSafe(canvas) {
                 if (!canvas) return;
                 const rect = canvas.parentElement.getBoundingClientRect();
@@ -529,7 +540,6 @@
                 }
             }
 
-            // 視窗改變大小時重設當前可見的畫布
             window.addEventListener('resize', () => {
                 resizeCanvasSafe(canvasMain);
                 if (document.getElementById('part-3').classList.contains('active')) {
@@ -540,7 +550,6 @@
                 }
             });
 
-            // 初始載入
             setTimeout(() => { resizeCanvasSafe(canvasMain); }, 100);
             const p5Img = document.getElementById('bg-img-p5');
             if (p5Img) {
@@ -561,7 +570,6 @@
                 parts.forEach((part, index) => {
                     if (index === currentPartIndex) {
                         part.classList.add('active');
-                        // 重新抓取大小以支援書寫
                         const c = part.querySelector('canvas');
                         if (c) {
                             setTimeout(() => { resizeCanvasSafe(c); }, 50);
@@ -635,7 +643,6 @@
                 }
             });
 
-            // 答題自動偵測
             document.getElementById('quiz-area').addEventListener('input', function(e) {
                 if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
                     const expected = (e.target.getAttribute('data-answer') || "").toLowerCase().trim();
