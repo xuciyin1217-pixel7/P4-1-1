@@ -5,11 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Review & Fish Tank Challenge</title>
     <style>
-        body {
+        /* 鎖定整體網頁高度，防止 iPad 上下滑動導致版面位移 */
+        html, body {
             margin: 0;
+            padding: 0;
+            height: 100%; 
+            overflow: hidden; 
+        }
+
+        body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
-            height: 100vh;
             background-color: #f4f6f9;
         }
         
@@ -22,12 +28,12 @@
             display: flex;
             flex-direction: column;
             position: relative;
+            overflow-y: auto; /* 只允許左側區域上下捲動 */
         }
 
         .quiz-part {
             display: none; 
             flex: 1;
-            overflow-y: auto;
             line-height: 1.8;
             font-size: 24px; 
             padding-bottom: 20px;
@@ -102,10 +108,12 @@
             display: flex;
             flex-direction: column;
             background: #fafafa;
+            min-width: 0; /* 防止子元素撐破父元素 */
         }
 
+        /* 魚缸區 */
         #tank-container {
-            flex: 4;
+            flex: 4; /* 佔據右側 40% 的高度 */
             position: relative;
             background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
             border-bottom: 3px solid #ccc;
@@ -113,6 +121,7 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            min-height: 0; 
         }
         
         .controls {
@@ -168,11 +177,13 @@
             text-align: center;
         }
 
+        /* 筆記區 */
         #whiteboard-container {
-            flex: 6;
+            flex: 6; /* 佔據右側 60% 的高度 */
             padding: 15px;
             display: flex;
             flex-direction: column;
+            min-height: 0; /* 關鍵：防止高度被畫布無限撐開 */
         }
         .toolbar {
             margin-bottom: 10px;
@@ -180,6 +191,7 @@
             align-items: center;
             gap: 10px;
             flex-wrap: wrap;
+            flex-shrink: 0;
         }
         .toolbar button {
             padding: 8px 14px;
@@ -189,21 +201,31 @@
             border-radius: 4px;
             background: #fff;
         }
-        /* 畫筆與橡皮擦按鈕啟動時的樣式 */
         .toolbar button.tool-active {
             background: #1976d2;
             color: white;
             border-color: #1976d2;
         }
 
-        canvas {
+        /* 畫布專屬外框 (用來限制 iPad 上的畫布尺寸亂跑) */
+        .canvas-wrapper {
+            position: relative;
             flex: 1;
+            width: 100%;
+            min-height: 0; 
+        }
+        .canvas-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             border: 2px dashed #999;
             background: #fff;
             cursor: crosshair;
-            width: 100%;
             border-radius: 8px;
             touch-action: none;
+            box-sizing: border-box;
         }
         
         /* Part 5 專屬圖片與畫布重疊容器 */
@@ -227,6 +249,7 @@
             height: 100%;
             background: transparent;
             border: none;
+            touch-action: none;
         }
     </style>
 </head>
@@ -301,7 +324,10 @@
                 <button id="btn-clear-p3">清除此區手寫</button>
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
-            <canvas id="part3Board" style="height: 450px; flex: none; margin-bottom: 20px;"></canvas>
+            <!-- 使用 canvas-wrapper 防止亂跑 -->
+            <div class="canvas-wrapper" style="height: 450px; flex: none; margin-bottom: 20px;">
+                <canvas id="part3Board"></canvas>
+            </div>
         </div>
 
         <!-- Part 4 -->
@@ -331,7 +357,7 @@
             </ul>
         </div>
         
-        <!-- Part 5 (圖片與畫布) -->
+        <!-- Part 5 -->
         <div class="quiz-part" id="part-5">
             <div class="section-title">Part five: reading p9</div>
             <div class="toolbar">
@@ -339,13 +365,12 @@
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
             <div class="image-board-container">
-                <!-- 這裡已將底圖名稱改為 9.png -->
                 <img src="9.png" alt="reading p9 background" id="bg-img-p5">
                 <canvas id="part5Board"></canvas>
             </div>
         </div>
         
-        <!-- Part 6 (填空題) -->
+        <!-- Part 6 -->
         <div class="quiz-part" id="part-6">
             <div class="section-title">Part six: reading p11</div>
             <ol>
@@ -383,7 +408,10 @@
                 <label style="font-size: 18px; margin-left: 10px;">顏色: <input type="color" id="penColor" value="#000000"></label>
                 <label style="font-size: 18px;">粗細: <input type="range" id="penSize" min="1" max="15" value="3"></label>
             </div>
-            <canvas id="drawingBoard"></canvas>
+            <!-- 使用 canvas-wrapper 防止亂跑 -->
+            <div class="canvas-wrapper">
+                <canvas id="drawingBoard"></canvas>
+            </div>
         </div>
     </div>
 
@@ -444,13 +472,10 @@
                         return;
                     }
 
-                    // 判斷是畫筆還是橡皮擦 (Destination-out 會將該路徑的像素變透明)
                     ctx.globalCompositeOperation = currentDrawMode === 'eraser' ? 'destination-out' : 'source-over';
-                    // 橡皮擦時稍微加粗一點比較好擦
                     ctx.lineWidth = currentDrawMode === 'eraser' ? parseInt(penSizeInput.value) * 2 : penSizeInput.value;
                     ctx.lineCap = 'round';
                     ctx.lineJoin = 'round';
-                    // 橡皮擦模式下顏色不重要，因為是擦除
                     ctx.strokeStyle = currentDrawMode === 'eraser' ? 'rgba(0,0,0,1)' : penColorInput.value;
 
                     ctx.lineTo(x, y);
@@ -484,8 +509,8 @@
             // 安全重置畫布大小，保留已畫內容
             function resizeCanvasSafe(canvas) {
                 if (!canvas) return;
-                const rect = canvas.getBoundingClientRect();
-                // 確保寬高有效再調整
+                const rect = canvas.parentElement.getBoundingClientRect();
+                
                 if (rect.width > 0 && rect.height > 0 && (canvas.width !== rect.width || canvas.height !== rect.height)) {
                     const tempCanvas = document.createElement('canvas');
                     tempCanvas.width = canvas.width || rect.width;
@@ -515,7 +540,7 @@
                 }
             });
 
-            // 初始載入右側主畫布與確保 P5 圖片載入後尺寸正常
+            // 初始載入
             setTimeout(() => { resizeCanvasSafe(canvasMain); }, 100);
             const p5Img = document.getElementById('bg-img-p5');
             if (p5Img) {
@@ -525,7 +550,6 @@
                     }
                 });
             }
-
 
             // --- 題目區切換邏輯 ---
             let currentPartIndex = 0;
@@ -537,17 +561,15 @@
                 parts.forEach((part, index) => {
                     if (index === currentPartIndex) {
                         part.classList.add('active');
-                        // 若切換到的區域有畫布，重新抓取大小以支援書寫
+                        // 重新抓取大小以支援書寫
                         const c = part.querySelector('canvas');
                         if (c) {
-                            // 使用 setTimeout 確保 DOM 已渲染高度
                             setTimeout(() => { resizeCanvasSafe(c); }, 50);
                         }
                     } else {
                         part.classList.remove('active');
                     }
                 });
-                // 更新按鈕狀態
                 btnPrev.disabled = currentPartIndex === 0;
                 btnNext.disabled = currentPartIndex === parts.length - 1;
             }
@@ -565,7 +587,6 @@
                     updatePartsDisplay();
                 }
             });
-
 
             // --- 魚缸區與作答邏輯 ---
             let fishCount = 0;
