@@ -32,7 +32,7 @@
             flex-direction: column;
             position: relative;
             overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; /* 讓 iPad 滾動更滑順 */
+            -webkit-overflow-scrolling: touch;
         }
 
         /* 恢復輸入框的選取功能 */
@@ -230,7 +230,7 @@
             background: #fff;
             cursor: crosshair;
             border-radius: 8px;
-            touch-action: none; /* 關鍵：禁止瀏覽器預設手勢 */
+            touch-action: none;
             box-sizing: border-box;
         }
         
@@ -261,69 +261,52 @@
 </head>
 <body>
 
+    <!-- 左側：題目區 -->
     <div id="quiz-area">
-        <!-- Part 0 -->
-        <div class="quiz-part active" id="part-0">
-            <div class="section-title">New Rules</div>
-            <ol>
-                <li>Don't leave your seat during class. If you leave your seat once, you lose one card.</li>
-                <li>Read the question and the answer out loud. If you are right, a fish will appear in the fish tank.</li>
-                <li>When you collect all the fish, all of you can get two cards.</li>
-            </ol>
-        </div>
-
+        
         <!-- Part 1 -->
-        <div class="quiz-part" id="part-1">
-            <div class="section-title">Part one: Review grammar p11</div>
-            <ol>
-                <li>"Some" should be used in <input type="text" data-answer="positive sentences">.</li>
-                <li>"Any" should be used in <input type="text" data-answer="negative sentences">, <input type="text" data-answer="interrogative sentences"> and <input type="text" data-answer="conditional sentences">.</li>
-                <li>"A lot of" equals to <input type="text" data-answer="many">, <input type="text" data-answer="much"> and <input type="text" data-answer="lots of">.</li>
-            </ol>
+        <div class="quiz-part active" id="part-1">
+            <div class="section-title">Part one: Word search</div>
+            <div style="font-size: 18px; margin-bottom: 10px; color: #555; line-height: 1.5;">
+                <strong>Words to find:</strong> BRIGHTLY, GROUND, SHINE, WEST, DAYTIME, NIGHTTIME, SONG, EAST, FIRECRACKER, NORTH, SANG, FROM, SET, SOUTH, STORY, TOLD
+            </div>
+            <div class="toolbar">
+                <button id="btn-clear-p1">清除圖片上手寫</button>
+                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
+            </div>
+            <div class="image-board-container">
+                <img src="01.jpg" alt="Word search" id="bg-img-p1">
+                <canvas id="part1Board"></canvas>
+            </div>
         </div>
 
         <!-- Part 2 -->
         <div class="quiz-part" id="part-2">
-            <div class="section-title">Part two: grammar p12</div>
+            <div class="section-title">Part two: Reading p10</div>
             <ol>
-                <li>Linda doesn't usually get <input type="text" data-answer="any"> mail.</li>
-                <li>I don't have <input type="text" data-answer="any"> homework to do, so I'm not busy this week.</li>
-                <li>I have <input type="text" data-answer="some"> noodles tonight.</li>
-                <li>We don't have <input type="text" data-answer="any"> fruit left in the fridge.</li>
-                <li>Stacy doesn't have <input type="text" data-answer="any"> brothers.</li>
-                <li>Steve doesn't have <input type="text" data-answer="any"> problems.</li>
-                <li>We don't have <input type="text" data-answer="any"> apples, oranges or watermelons.</li>
-                <li>Henry wants to buy <input type="text" data-answer="some"> pencils in the stationery shop.</li>
-                <li>Jack needs <input type="text" data-answer="some"> help, but no one wants to help him.</li>
-                <li>Anna doesn't have <input type="text" data-answer="any"> paper, so she can't write the letter.</li>
-                <li>Mother will go to the grocery shop. Do you need <input type="text" data-answer="any"> food?</li>
-                <li>There are <input type="text" data-answer="some"> birds standing on the electric pole.</li>
-                <li>Look! There are <input type="text" data-answer="some"> beautiful swans by the pond.</li>
-                <li>Mr. Brown spilled <input type="text" data-answer="some"> coffee on his jacket.</li>
-                <li>Teacher gives Tom <input type="text" data-answer="some"> advice.</li>
+                <li>I <input type="text" data-answer="went"> [wɛnt] swimming yesterday.</li>
+                <li>Don't <input type="text" data-answer="move"> [muv] the things on my table.</li>
+                <li>Which <input type="text" data-answer="side"> [saɪd] are you on?</li>
+                <li>Where does he come <input type="text" data-answer="from"> [frɑm]?</li>
+                <li>The sun rises in the <input type="text" data-answer="east"> [ist].</li>
+                <li>Sam <input type="text" data-answer="told"> [told] a story to me.</li>
+                <li>The children like to <input type="text" data-answer="set"> [sɛt] off firecrackers.</li>
+                <li>It fell to the <input type="text" data-answer="ground"> [graʊnd].</li>
+                <li>The sun was <input type="text" data-answer="shining"> [ʃaɪnɪŋ].</li>
+                <li>Babies sleep even in the <input type="text" data-answer="daytime"> [de.taɪm].</li>
             </ol>
-
-            <h3 style="color: #2c3e50;">Sentence Transformation</h3>
-            <ol>
-                <li>Peter gets along well with people, so he has <u>many</u> friends.<br>
-                    ➔ Peter gets along well with people, so he has <input type="text" data-answer="a lot of"> friends.
-                </li>
-                <li>Father ran into <u>much</u> trouble when he was still a little boy.<br>
-                    ➔ Father ran into <input type="text" data-answer="a lot of"> trouble when he was still a little boy.
-                </li>
-                <li>Bill is always thinking of making <u>much</u> money in the future.<br>
-                    ➔ Bill is always thinking of making <input type="text" data-answer="a lot of"> money in the future.
-                </li>
-                <li>In general, we have <u>much</u> rain in August here.<br>
-                    ➔ In general, we have <input type="text" data-answer="a lot of"> rain in August here.
-                </li>
-            </ol>
+            <div class="toolbar">
+                <button id="btn-clear-p2">清除圖片上手寫</button>
+            </div>
+            <div class="image-board-container">
+                <img src="04.jpg" alt="Reading p10" id="bg-img-p2">
+                <canvas id="part2Board"></canvas>
+            </div>
         </div>
 
         <!-- Part 3 -->
         <div class="quiz-part" id="part-3">
-            <div class="section-title">Part three: countable v.s. uncountable</div>
-            
+            <div class="section-title">Part three: Hamburger Paragraph</div>
             <div class="toolbar">
                 <button id="btn-clear-p3">清除此區手寫</button>
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
@@ -335,56 +318,53 @@
 
         <!-- Part 4 -->
         <div class="quiz-part" id="part-4">
-            <div class="section-title">Part four: review Unit two</div>
-            <p>1. Please answer whether these are countable or uncountable.</p>
-            <ul style="list-style: none;">
-                <li>(1) sharpener: <input type="text" data-answer="countable"></li>
-                <li>(2) spoon: <input type="text" data-answer="countable"></li>
-                <li>(3) brick: <input type="text" data-answer="countable"></li>
-                <li>(4) soil: <input type="text" data-answer="uncountable"></li>
-            </ul>
-            
-            <p>2. Fill in the blanks with "many" or "much".</p>
-            <ul style="list-style: none;">
-                <li>(1) Too <input type="text" data-answer="much"> dust makes her sneeze.</li>
-                <li>(2) There is not <input type="text" data-answer="much"> bread left.</li>
-                <li>(3) Jason is very naughty. He always causes <input type="text" data-answer="much"> trouble for everybody.</li>
-                <li>(4) I have <input type="text" data-answer="many"> books on my desk.</li>
-            </ul>
-
-            <p>3. Fill in the blanks with "a few" or "a little".</p>
-            <ul style="list-style: none;">
-                <li>(1) "Do take <input type="text" data-answer="a few"> melons," Uncle Robert said as he gave me three melons.</li>
-                <li>(2) Please add <input type="text" data-answer="a little"> ketchup to the dish.</li>
-                <li>(3) I add <input type="text" data-answer="a little"> sugar to my coffee.</li>
-            </ul>
+            <div class="section-title">Part four: Reading p11</div>
+            <p>短文寫作：寫一篇你和家人過中秋節的情景。</p>
+            <div class="toolbar">
+                <button id="btn-clear-p4">清除圖片上手寫</button>
+            </div>
+            <div class="image-board-container">
+                <img src="05.jpg" alt="Reading p11" id="bg-img-p4">
+                <canvas id="part4Board"></canvas>
+            </div>
         </div>
         
         <!-- Part 5 -->
         <div class="quiz-part" id="part-5">
-            <div class="section-title">Part five: reading p9</div>
+            <div class="section-title">Part five: Singular Nouns v.s. Plural Nouns</div>
             <div class="toolbar">
-                <button id="btn-clear-p5">清除圖片上手寫</button>
-                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
+                <button id="btn-clear-p5">清除此區手寫</button>
             </div>
-            <div class="image-board-container">
-                <img src="9.png" alt="reading p9 background" id="bg-img-p5">
+            <div class="canvas-wrapper" style="height: 450px; flex: none; margin-bottom: 20px;">
                 <canvas id="part5Board"></canvas>
             </div>
         </div>
         
         <!-- Part 6 -->
         <div class="quiz-part" id="part-6">
-            <div class="section-title">Part six: reading p11</div>
-            <ol>
-                <li><input type="text" data-answer="In"> the morning, my mother went <input type="text" data-answer="to"> the street.</li>
-                <li>After <input type="text" data-answer="eating"> dinner, my father asked my older brother and younger sister to move the table.</li>
-                <li>Then, we put moon cakes and pomelos <input type="text" data-answer="on"> the table.</li>
-                <li>We ate moon cakes <input type="text" data-answer="on"> one side, and we watched the moon on the other side.</li>
-                <li>The moon rose slowly <input type="text" data-answer="in"> the east.</li>
-            </ol>
+            <div class="section-title">Part six: Grammar p13</div>
+            <div class="toolbar">
+                <button id="btn-clear-p6">清除圖片上手寫</button>
+            </div>
+            <div class="image-board-container">
+                <img src="02.jpg" alt="Grammar p13" id="bg-img-p6">
+                <canvas id="part6Board"></canvas>
+            </div>
         </div>
 
+        <!-- Part 7 -->
+        <div class="quiz-part" id="part-7">
+            <div class="section-title">Part seven: Grammar p14</div>
+            <div class="toolbar">
+                <button id="btn-clear-p7">清除圖片上手寫</button>
+            </div>
+            <div class="image-board-container">
+                <img src="03.jpg" alt="Grammar p14" id="bg-img-p7">
+                <canvas id="part7Board"></canvas>
+            </div>
+        </div>
+
+        <!-- 切換按鈕 -->
         <div class="nav-buttons">
             <button id="btn-prev" disabled>上一部分</button>
             <button id="btn-next">下一部分</button>
@@ -448,7 +428,6 @@
 
                 function getEventPos(e) {
                     const rect = canvas.getBoundingClientRect();
-                    // 判斷是觸控事件還是滑鼠事件
                     if (e.touches && e.touches.length > 0) {
                         return {
                             x: e.touches[0].clientX - rect.left,
@@ -464,7 +443,6 @@
                 }
 
                 function startDrawing(e) {
-                    // 防止螢幕在觸控時滑動
                     if (e.cancelable) e.preventDefault(); 
                     isDrawing = true;
                     draw(e);
@@ -494,13 +472,11 @@
                     ctx.moveTo(pos.x, pos.y);
                 }
 
-                // 註冊滑鼠事件
                 canvas.addEventListener('mousedown', startDrawing);
                 canvas.addEventListener('mouseup', stopDrawing);
                 canvas.addEventListener('mouseout', stopDrawing);
                 canvas.addEventListener('mousemove', draw);
 
-                // 註冊觸控事件 (傳入完整的 Event 物件而非 touch[0])
                 canvas.addEventListener('touchstart', startDrawing, { passive: false });
                 canvas.addEventListener('touchend', stopDrawing);
                 canvas.addEventListener('touchcancel', stopDrawing);
@@ -514,9 +490,14 @@
                 return canvas;
             }
 
-            const canvasMain = setupCanvas('drawingBoard', 'btn-clear');
-            const canvasP3 = setupCanvas('part3Board', 'btn-clear-p3');
-            const canvasP5 = setupCanvas('part5Board', 'btn-clear-p5');
+            // 初始化所有畫布
+            const canvasIds = ['drawingBoard', 'part1Board', 'part2Board', 'part3Board', 'part4Board', 'part5Board', 'part6Board', 'part7Board'];
+            const clearBtnIds = ['btn-clear', 'btn-clear-p1', 'btn-clear-p2', 'btn-clear-p3', 'btn-clear-p4', 'btn-clear-p5', 'btn-clear-p6', 'btn-clear-p7'];
+            const canvases = [];
+
+            for(let i = 0; i < canvasIds.length; i++) {
+                canvases.push(setupCanvas(canvasIds[i], clearBtnIds[i]));
+            }
 
             function resizeCanvasSafe(canvas) {
                 if (!canvas) return;
@@ -540,25 +521,31 @@
                 }
             }
 
+            // 監聽視窗變化
             window.addEventListener('resize', () => {
-                resizeCanvasSafe(canvasMain);
-                if (document.getElementById('part-3').classList.contains('active')) {
-                    resizeCanvasSafe(canvasP3);
-                }
-                if (document.getElementById('part-5').classList.contains('active')) {
-                    resizeCanvasSafe(canvasP5);
+                canvases.forEach(c => {
+                    if (c && c.offsetParent !== null) {
+                        resizeCanvasSafe(c);
+                    }
+                });
+            });
+
+            // 確保圖片載入後正確重設畫布大小
+            const imgIds = ['bg-img-p1', 'bg-img-p2', 'bg-img-p4', 'bg-img-p6', 'bg-img-p7'];
+            imgIds.forEach(id => {
+                const img = document.getElementById(id);
+                if (img) {
+                    img.addEventListener('load', () => {
+                        canvases.forEach(c => {
+                            if (c && c.offsetParent !== null) {
+                                resizeCanvasSafe(c);
+                            }
+                        });
+                    });
                 }
             });
 
-            setTimeout(() => { resizeCanvasSafe(canvasMain); }, 100);
-            const p5Img = document.getElementById('bg-img-p5');
-            if (p5Img) {
-                p5Img.addEventListener('load', () => {
-                    if (document.getElementById('part-5').classList.contains('active')) {
-                        resizeCanvasSafe(canvasP5);
-                    }
-                });
-            }
+            setTimeout(() => { resizeCanvasSafe(canvases[0]); }, 100);
 
             // --- 題目區切換邏輯 ---
             let currentPartIndex = 0;
@@ -570,16 +557,20 @@
                 parts.forEach((part, index) => {
                     if (index === currentPartIndex) {
                         part.classList.add('active');
-                        const c = part.querySelector('canvas');
-                        if (c) {
+                        // 針對當前顯示的部分，重置其內部畫布尺寸
+                        const activeCanvases = part.querySelectorAll('canvas');
+                        activeCanvases.forEach(c => {
                             setTimeout(() => { resizeCanvasSafe(c); }, 50);
-                        }
+                        });
                     } else {
                         part.classList.remove('active');
                     }
                 });
                 btnPrev.disabled = currentPartIndex === 0;
                 btnNext.disabled = currentPartIndex === parts.length - 1;
+                
+                // 切換區塊時自動滾回最上方
+                document.getElementById('quiz-area').scrollTop = 0;
             }
 
             btnPrev.addEventListener('click', () => {
@@ -598,11 +589,14 @@
 
             // --- 魚缸區與作答邏輯 ---
             let fishCount = 0;
-            const targetFish = 43; 
+            const targetFish = 48; // 更新通關目標數量
             const tank = document.getElementById('tank');
             const successMsg = document.getElementById('success-msg');
             const btnAdd = document.getElementById('btn-add');
             const btnSub = document.getElementById('btn-sub');
+            
+            // 豐富的海洋生物種類
+            const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦀', '🦐', '🦑', '🐬', '🐳', '🐢', '🪼', '🦈'];
 
             function updateTank() {
                 const currentFishes = tank.getElementsByClassName('fish').length;
@@ -611,7 +605,6 @@
                     for (let i = 0; i < (fishCount - currentFishes); i++) {
                         const fish = document.createElement('span');
                         fish.className = 'fish';
-                        const fishEmojis = ['🐟', '🐠', '🐡'];
                         fish.innerText = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
                         fish.style.left = Math.random() * 85 + '%';
                         fish.style.top = Math.random() * 80 + '%';
