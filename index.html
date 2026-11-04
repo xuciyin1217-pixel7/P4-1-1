@@ -219,7 +219,6 @@
             min-height: 0; 
         }
         
-        /* 確保畫布支援多點觸控且不會滑動網頁 */
         .canvas-wrapper canvas {
             position: absolute;
             top: 0;
@@ -245,7 +244,7 @@
             display: block;
             border-radius: 8px;
             border: 1px solid #ccc;
-            pointer-events: none; /* 防止圖片干擾觸控 */
+            pointer-events: none; 
         }
         .image-board-container canvas {
             position: absolute;
@@ -264,7 +263,7 @@
     <!-- 左側：題目區 -->
     <div id="quiz-area">
         
-        <!-- Part 1 (對應 01.jpg) -->
+        <!-- Part 1 -->
         <div class="quiz-part active" id="part-1">
             <div class="section-title">Part one: Word search</div>
             <div style="font-size: 18px; margin-bottom: 10px; color: #555; line-height: 1.5;">
@@ -280,7 +279,7 @@
             </div>
         </div>
 
-        <!-- Part 2 (對應 04.jpg) -->
+        <!-- Part 2 -->
         <div class="quiz-part" id="part-2">
             <div class="section-title">Part two: Reading p10</div>
             <ol>
@@ -316,7 +315,7 @@
             </div>
         </div>
 
-        <!-- Part 4 (對應 05.jpg) -->
+        <!-- Part 4 -->
         <div class="quiz-part" id="part-4">
             <div class="section-title">Part four: Reading p11</div>
             <p>短文寫作：寫一篇你和家人過中秋節的情景。</p>
@@ -340,7 +339,7 @@
             </div>
         </div>
         
-        <!-- Part 6 (對應 02.jpg) -->
+        <!-- Part 6 -->
         <div class="quiz-part" id="part-6">
             <div class="section-title">Part six: Grammar p13</div>
             <div class="toolbar">
@@ -352,7 +351,7 @@
             </div>
         </div>
 
-        <!-- Part 7 (對應 03.jpg) -->
+        <!-- Part 7 -->
         <div class="quiz-part" id="part-7">
             <div class="section-title">Part seven: Grammar p14</div>
             <div class="toolbar">
@@ -595,11 +594,11 @@
             const btnAdd = document.getElementById('btn-add');
             const btnSub = document.getElementById('btn-sub');
             
-            // 將海洋生物種類擴充至 20 種
+            // 20種海洋生物全圖鑑！(已打亂順序確保每次都有明顯不同的變化)
             const fishEmojis = [
-                '🐟', '🐠', '🐡', '🐙', '🦀', 
-                '🦐', '🦑', '🐬', '🐳', '🐢', 
-                '🪼', '🦈', '🦭', '🦞', '🐋', 
+                '🐟', '🐙', '🐢', '🦀', '🐠', 
+                '🐬', '🪼', '🦐', '🐳', '🐡', 
+                '🦑', '🦈', '🦭', '🦞', '🐋', 
                 '🪸', '🐚', '🫧', '🌿', '⭐'
             ];
 
@@ -610,7 +609,11 @@
                     for (let i = 0; i < (fishCount - currentFishes); i++) {
                         const fish = document.createElement('span');
                         fish.className = 'fish';
-                        fish.innerText = fishEmojis[Math.floor(Math.random() * fishEmojis.length)];
+                        
+                        // 【關鍵修改】：不再用隨機數，改用依序出現 (0 到 19 輪流)，確保 20 種一定全部出列
+                        const emojiIndex = (currentFishes + i) % fishEmojis.length;
+                        fish.innerText = fishEmojis[emojiIndex];
+                        
                         fish.style.left = Math.random() * 85 + '%';
                         fish.style.top = Math.random() * 80 + '%';
                         if (Math.random() > 0.5) fish.style.transform = 'scaleX(-1)';
