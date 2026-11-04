@@ -264,7 +264,7 @@
     <!-- 左側：題目區 -->
     <div id="quiz-area">
         
-        <!-- Part 1 -->
+        <!-- Part 1 (對應 01.jpg) -->
         <div class="quiz-part active" id="part-1">
             <div class="section-title">Part one: Word search</div>
             <div style="font-size: 18px; margin-bottom: 10px; color: #555; line-height: 1.5;">
@@ -280,7 +280,7 @@
             </div>
         </div>
 
-        <!-- Part 2 -->
+        <!-- Part 2 (對應 04.jpg) -->
         <div class="quiz-part" id="part-2">
             <div class="section-title">Part two: Reading p10</div>
             <ol>
@@ -316,7 +316,7 @@
             </div>
         </div>
 
-        <!-- Part 4 -->
+        <!-- Part 4 (對應 05.jpg) -->
         <div class="quiz-part" id="part-4">
             <div class="section-title">Part four: Reading p11</div>
             <p>短文寫作：寫一篇你和家人過中秋節的情景。</p>
@@ -340,7 +340,7 @@
             </div>
         </div>
         
-        <!-- Part 6 -->
+        <!-- Part 6 (對應 02.jpg) -->
         <div class="quiz-part" id="part-6">
             <div class="section-title">Part six: Grammar p13</div>
             <div class="toolbar">
@@ -352,7 +352,7 @@
             </div>
         </div>
 
-        <!-- Part 7 -->
+        <!-- Part 7 (對應 03.jpg) -->
         <div class="quiz-part" id="part-7">
             <div class="section-title">Part seven: Grammar p14</div>
             <div class="toolbar">
@@ -589,14 +589,19 @@
 
             // --- 魚缸區與作答邏輯 ---
             let fishCount = 0;
-            const targetFish = 48; // 更新通關目標數量
+            const targetFish = 48; // 通關目標數量
             const tank = document.getElementById('tank');
             const successMsg = document.getElementById('success-msg');
             const btnAdd = document.getElementById('btn-add');
             const btnSub = document.getElementById('btn-sub');
             
-            // 豐富的海洋生物種類
-            const fishEmojis = ['🐟', '🐠', '🐡', '🐙', '🦀', '🦐', '🦑', '🐬', '🐳', '🐢', '🪼', '🦈'];
+            // 將海洋生物種類擴充至 20 種
+            const fishEmojis = [
+                '🐟', '🐠', '🐡', '🐙', '🦀', 
+                '🦐', '🦑', '🐬', '🐳', '🐢', 
+                '🪼', '🦈', '🦭', '🦞', '🐋', 
+                '🪸', '🐚', '🫧', '🌿', '⭐'
+            ];
 
             function updateTank() {
                 const currentFishes = tank.getElementsByClassName('fish').length;
