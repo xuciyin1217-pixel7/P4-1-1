@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Grammar & Meadow Animal Challenge</title>
+    <style>
+        /* 鎖定整體網頁高度，防止 iPad 上下滑動導致版面位移 */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%; 
+            overflow: hidden; 
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            background-color: #f4f6f9;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+        
+        /* 左側題目區 */
+        #quiz-area {
+            flex: 6;
+            padding: 30px;
+            background-color: #ffffff;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .quiz-part {
+            display: none; 
+            flex: 1;
+            line-height: 1.8;
+            font-size: 24px; 
+            padding-bottom: 20px;
+        }
+        .quiz-part.active {
+            display: block; 
+        }
+
+        .section-title {
+            background-color: #e8f5e9;
+            padding: 12px;
+            border-left: 6px solid #4caf50;
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 30px; 
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+            margin-top: 10px;
+            flex-shrink: 0;
+        }
+        .nav-buttons button {
+            padding: 10px 20px;
+            font-size: 20px;
+            cursor: pointer;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .nav-buttons button:hover { background: #388e3c; }
+        .nav-buttons button:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* 右側面板 */
+        #side-area {
+            flex: 4;
+            display: flex;
+            flex-direction: column;
+            background: #fafafa;
+            min-width: 0; 
+        }
+
+        /* 草皮區 */
+        #meadow-container {
+            flex: 4; 
+            position: relative;
+            background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 35%, #81c784 75%, #66bb6a 100%);
+            border-bottom: 3px solid #8d6e63;
+            padding: 10px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; 
+        }
+        
+        .controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+        }
+        .controls button {
+            padding: 8px 12px;
+            font-size: 16px;
+            cursor: pointer;
+            background: rgba(56, 142, 60, 0.85);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-left: 5px;
+        }
+        .controls button:hover { background: #2e7d32; }
+        
+        #meadow {
+            flex: 1;
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+        .animal {
+            position: absolute;
+            font-size: 40px;
+            animation: hop 3s ease-in-out infinite alternate;
+            transition: opacity 0.3s;
+        }
+        @keyframes hop {
+            from { transform: translateX(0px) translateY(0px); }
+            to { transform: translateX(20px) translateY(-12px); }
+        }
+        
+        #success-msg {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 215, 0, 0.95);
+            color: #d32f2f;
+            padding: 20px 50px;
+            font-size: 48px;
+            font-weight: bold;
+            border-radius: 15px;
+            border: 5px solid #ff9800;
+            z-index: 20;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        /* 筆記區 */
+        #whiteboard-container {
+            flex: 6; 
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0; 
+        }
+        .toolbar {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+        }
+        .toolbar button {
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fff;
+        }
+        .toolbar button.tool-active {
+            background: #1976d2;
+            color: white;
+            border-color: #1976d2;
+        }
+
+        .canvas-wrapper {
+            position: relative;
+            flex: 1;
+            width: 100%;
+            min-height: 0; 
+        }
+        
+        .canvas-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #999;
+            background: #fff;
+            cursor: crosshair;
+            border-radius: 8px;
+            touch-action: none;
+            box-sizing: border-box;
+        }
+        
+        .image-board-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .image-board-container img {
+            width: 100%;
+            display: block;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            pointer-events: none;
+        }
+        .image-board-container canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 左側：題目區 -->
+    <div id="quiz-area">
+        
+        <!-- Part 1: Grammar p14 (Unit 3-2) -->
+        <div class="quiz-part active" id="part-1">
+            <div class="section-title">Grammar p14 (Unit 3-2)</div>
+            <div class="toolbar">
+                <button id="btn-clear-p1">清除圖片上手寫</button>
+                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
+            </div>
+            <div class="image-board-container">
+                <img src="image (12).png" onerror="if(!this.dataset.tried){this.dataset.tried=true;this.src='image (12).jpg';}" alt="Grammar p14" id="bg-img-p1">
+                <canvas id="part1Board"></canvas>
+            </div>
+        </div>
+
+        <!-- Part 2: Grammar p15 (純白板) -->
+        <div class="quiz-part" id="part-2">
+            <div class="section-title">Grammar p15</div>
+            <div class="toolbar">
+                <button id="btn-clear-p2">清除此區手寫</button>
+                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
+            </div>
+            <div class="canvas-wrapper" style="height: 520px; flex: none; margin-bottom: 20px;">
+                <canvas id="part2Board"></canvas>
+            </div>
+        </div>
+
+        <!-- Part 3: Grammar p15 (Unit 3-3) -->
+        <div class="quiz-part" id="part-3">
+            <div class="section-title">Grammar p15 (Unit 3-3)</div>
+            <div class="toolbar">
+                <button id="btn-clear-p3">清除圖片上手寫</button>
+                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
+            </div>
+            <div class="image-board-container">
+                <img src="image (13).png" onerror="if(!this.dataset.tried){this.dataset.tried=true;this.src='image (13).jpg';}" alt="Grammar p15" id="bg-img-p3">
+                <canvas id="part3Board"></canvas>
+            </div>
+        </div>
+
+        <!-- 切換按鈕 -->
+        <div class="nav-buttons">
+            <button id="btn-prev" disabled>上一部分</button>
+            <button id="btn-next">下一部分</button>
+        </div>
+    </div>
+
+    <!-- 右側：草皮與筆記區 -->
+    <div id="side-area">
+        <div id="meadow-container">
+            <div class="controls">
+                <button id="btn-add">+ 增加</button>
+                <button id="btn-sub">- 減少</button>
+            </div>
+            <div id="meadow"></div>
+            <div id="success-msg">Finish!</div>
+        </div>
+
+        <div id="whiteboard-container">
+            <div class="toolbar">
+                <button id="btn-pen" class="tool-active">🖌️ 畫筆</button>
+                <button id="btn-eraser">🧽 橡皮擦</button>
+                <button id="btn-clear">🗑️ 清除</button>
+                <label style="font-size: 18px; margin-left: 10px;">顏色: <input type="color" id="penColor" value="#000000"></label>
+                <label style="font-size: 18px;">粗細: <input type="range" id="penSize" min="1" max="15" value="3"></label>
+            </div>
+            <div class="canvas-wrapper">
+                <canvas id="drawingBoard"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- 工具狀態管理 ---
+            let currentDrawMode = 'pen';
+            const btnPen = document.getElementById('btn-pen');
+            const btnEraser = document.getElementById('btn-eraser');
+
+            btnPen.addEventListener('click', () => {
+                currentDrawMode = 'pen';
+                btnPen.classList.add('tool-active');
+                btnEraser.classList.remove('tool-active');
+            });
+
+            btnEraser.addEventListener('click', () => {
+                currentDrawMode = 'eraser';
+                btnEraser.classList.add('tool-active');
+                btnPen.classList.remove('tool-active');
+            });
+
+            // --- 畫布共用處理邏輯 ---
+            function setupCanvas(canvasId, clearBtnId) {
+                const canvas = document.getElementById(canvasId);
+                if (!canvas) return null;
+                const ctx = canvas.getContext('2d');
+                const btnClear = document.getElementById(clearBtnId);
+                const penColorInput = document.getElementById('penColor');
+                const penSizeInput = document.getElementById('penSize');
+                let isDrawing = false;
+
+                function getEventPos(e) {
+                    const rect = canvas.getBoundingClientRect();
+                    if (e.touches && e.touches.length > 0) {
+                        return {
+                            x: e.touches[0].clientX - rect.left,
+                            y: e.touches[0].clientY - rect.top
+                        };
+                    } else if (e.clientX !== undefined) {
+                        return {
+                            x: e.clientX - rect.left,
+                            y: e.clientY - rect.top
+                        };
+                    }
+                    return null;
+                }
+
+                function startDrawing(e) {
+                    if (e.cancelable) e.preventDefault(); 
+                    isDrawing = true;
+                    draw(e);
+                }
+
+                function stopDrawing() {
+                    isDrawing = false;
+                    ctx.beginPath();
+                }
+
+                function draw(e) {
+                    if (!isDrawing) return;
+                    if (e.cancelable) e.preventDefault();
+                    
+                    const pos = getEventPos(e);
+                    if (!pos) return;
+
+                    ctx.globalCompositeOperation = currentDrawMode === 'eraser' ? 'destination-out' : 'source-over';
+                    ctx.lineWidth = currentDrawMode === 'eraser' ? parseInt(penSizeInput.value) * 2 : penSizeInput.value;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.strokeStyle = currentDrawMode === 'eraser' ? 'rgba(0,0,0,1)' : penColorInput.value;
+
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(pos.x, pos.y);
+                }
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseout', stopDrawing);
+                canvas.addEventListener('mousemove', draw);
+
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
+                canvas.addEventListener('touchend', stopDrawing);
+                canvas.addEventListener('touchcancel', stopDrawing);
+                canvas.addEventListener('touchmove', draw, { passive: false });
+
+                if (btnClear) {
+                    btnClear.addEventListener('click', () => {
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                    });
+                }
+                return canvas;
+            }
+
+            // 初始化所有畫布
+            const canvasIds = ['drawingBoard', 'part1Board', 'part2Board', 'part3Board'];
+            const clearBtnIds = ['btn-clear', 'btn-clear-p1', 'btn-clear-p2', 'btn-clear-p3'];
+            const canvases = [];
+
+            for (let i = 0; i < canvasIds.length; i++) {
+                canvases.push(setupCanvas(canvasIds[i], clearBtnIds[i]));
+            }
+
+            function resizeCanvasSafe(canvas) {
+                if (!canvas) return;
+                const rect = canvas.parentElement.getBoundingClientRect();
+                
+                if (rect.width > 0 && rect.height > 0 && (canvas.width !== Math.round(rect.width) || canvas.height !== Math.round(rect.height))) {
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = canvas.width || rect.width;
+                    tempCanvas.height = canvas.height || rect.height;
+                    
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
+                    }
+                    
+                    canvas.width = Math.round(rect.width);
+                    canvas.height = Math.round(rect.height);
+                    
+                    if (canvas.width > 0 && canvas.height > 0) {
+                        canvas.getContext('2d').drawImage(tempCanvas, 0, 0);
+                    }
+                }
+            }
+
+            // 使用 ResizeObserver 確保在 iPad 上圖片載入或切換分頁時畫布尺寸精準對齊
+            const resizeObserver = new ResizeObserver(() => {
+                canvases.forEach(c => {
+                    if (c && c.offsetParent !== null) {
+                        resizeCanvasSafe(c);
+                    }
+                });
+            });
+
+            canvases.forEach(c => {
+                if (c && c.parentElement) {
+                    resizeObserver.observe(c.parentElement);
+                }
+            });
+
+            window.addEventListener('resize', () => {
+                canvases.forEach(c => {
+                    if (c && c.offsetParent !== null) {
+                        resizeCanvasSafe(c);
+                    }
+                });
+            });
+
+            setTimeout(() => { 
+                resizeCanvasSafe(canvases[0]); 
+                resizeCanvasSafe(canvases[1]); 
+            }, 100);
+
+            // --- 題目區切換邏輯 ---
+            let currentPartIndex = 0;
+            const parts = document.querySelectorAll('.quiz-part');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+
+            function updatePartsDisplay() {
+                parts.forEach((part, index) => {
+                    if (index === currentPartIndex) {
+                        part.classList.add('active');
+                        const activeCanvases = part.querySelectorAll('canvas');
+                        activeCanvases.forEach(c => {
+                            setTimeout(() => { resizeCanvasSafe(c); }, 50);
+                        });
+                    } else {
+                        part.classList.remove('active');
+                    }
+                });
+                btnPrev.disabled = currentPartIndex === 0;
+                btnNext.disabled = currentPartIndex === parts.length - 1;
+                document.getElementById('quiz-area').scrollTop = 0;
+            }
+
+            btnPrev.addEventListener('click', () => {
+                if (currentPartIndex > 0) {
+                    currentPartIndex--;
+                    updatePartsDisplay();
+                }
+            });
+
+            btnNext.addEventListener('click', () => {
+                if (currentPartIndex < parts.length - 1) {
+                    currentPartIndex++;
+                    updatePartsDisplay();
+                }
+            });
+
+            // --- 草皮與動物邏輯 ---
+            let animalCount = 0;
+            const targetAnimals = 36; // 集滿 36 隻動物過關
+            const meadow = document.getElementById('meadow');
+            const successMsg = document.getElementById('success-msg');
+            const btnAdd = document.getElementById('btn-add');
+            const btnSub = document.getElementById('btn-sub');
+            
+            // 20 種草地與陸地動物全圖鑑（依序出現，確保全部都會登場）
+            const animalEmojis = [
+                '🐶', '🐰', '🦊', '🐻', '🐼', 
+                '🐨', '🐯', '🦁', '🐮', '🐷', 
+                '🐸', '🐵', '🐔', '🦆', '🐑', 
+                '🐴', '🦄', '🦔', '🐿️', '🐱'
+            ];
+
+            function updateMeadow() {
+                const currentAnimals = meadow.getElementsByClassName('animal').length;
+                
+                if (currentAnimals < animalCount) {
+                    for (let i = 0; i < (animalCount - currentAnimals); i++) {
+                        const animal = document.createElement('span');
+                        animal.className = 'animal';
+                        
+                        const emojiIndex = (currentAnimals + i) % animalEmojis.length;
+                        animal.innerText = animalEmojis[emojiIndex];
+                        
+                        animal.style.left = Math.random() * 85 + '%';
+                        animal.style.top = Math.random() * 78 + '%';
+                        if (Math.random() > 0.5) animal.style.transform = 'scaleX(-1)';
+                        meadow.appendChild(animal);
+                    }
+                } else if (currentAnimals > animalCount) {
+                    for (let i = 0; i < (currentAnimals - animalCount); i++) {
+                        if (meadow.lastChild) meadow.removeChild(meadow.lastChild);
+                    }
+                }
+
+                if (animalCount >= targetAnimals) {
+                    successMsg.style.display = 'block';
+                } else {
+                    successMsg.style.display = 'none';
+                }
+            }
+
+            btnAdd.addEventListener('click', () => {
+                animalCount++;
+                updateMeadow();
+            });
+
+            btnSub.addEventListener('click', () => {
+                if (animalCount > 0) {
+                    animalCount--;
+                    updateMeadow();
+                }
+            });
+            
+        });
+    </script>
+</body>
+</html>
