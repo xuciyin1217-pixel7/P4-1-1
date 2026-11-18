@@ -1,9 +1,14 @@
+已將程式碼中的底圖路徑精準對應為您資料夾中的 **`image (12)`**（Unit 3-2）與 **`image (13)`**（Unit 3-3），並加入了副檔名自動相容機制（無論檔案實際為 `.png` 或 `.jpg` 都能正常顯示）。
+
+請直接複製以下完整程式碼覆蓋您的 `.html` 檔案，並確保與這兩張圖片放在同一個資料夾內即可：
+
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>English Review & Fish Tank Challenge</title>
+    <title>English Grammar & Meadow Animal Challenge</title>
     <style>
         /* 鎖定整體網頁高度，防止 iPad 上下滑動導致版面位移 */
         html, body {
@@ -17,7 +22,6 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             background-color: #f4f6f9;
-            /* 防止文字在畫圖時被意外反白選取 */
             -webkit-user-select: none;
             user-select: none;
         }
@@ -35,12 +39,6 @@
             -webkit-overflow-scrolling: touch;
         }
 
-        /* 恢復輸入框的選取功能 */
-        input[type="text"] {
-            -webkit-user-select: text;
-            user-select: text;
-        }
-
         .quiz-part {
             display: none; 
             flex: 1;
@@ -51,43 +49,16 @@
         .quiz-part.active {
             display: block; 
         }
-        .quiz-part li, .quiz-part p {
-            margin-bottom: 15px; 
-        }
 
         .section-title {
-            background-color: #e3f2fd;
+            background-color: #e8f5e9;
             padding: 12px;
-            border-left: 6px solid #2196f3;
+            border-left: 6px solid #4caf50;
             margin-top: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             font-size: 30px; 
             font-weight: bold;
             color: #2c3e50;
-        }
-        
-        input[type="text"] {
-            width: 120px; 
-            border: none;
-            border-bottom: 3px solid #999;
-            background: #f9f9f9;
-            text-align: center;
-            font-size: 24px; 
-            color: #333;
-            outline: none;
-            transition: 0.3s;
-            margin: 0 5px;
-            padding: 2px 5px;
-        }
-        input[type="text"]:focus {
-            border-bottom: 3px solid #2196f3;
-            background: #e3f2fd;
-        }
-        input[type="text"]:disabled {
-            border-bottom: 3px solid #4caf50;
-            background: transparent;
-            color: #4caf50;
-            font-weight: bold;
         }
 
         .nav-buttons {
@@ -102,14 +73,15 @@
             padding: 10px 20px;
             font-size: 20px;
             cursor: pointer;
-            background: #2196f3;
+            background: #4caf50;
             color: white;
             border: none;
             border-radius: 5px;
         }
-        .nav-buttons button:hover { background: #1976d2; }
+        .nav-buttons button:hover { background: #388e3c; }
         .nav-buttons button:disabled { background: #ccc; cursor: not-allowed; }
 
+        /* 右側面板 */
         #side-area {
             flex: 4;
             display: flex;
@@ -118,11 +90,12 @@
             min-width: 0; 
         }
 
-        #tank-container {
+        /* 草皮區 */
+        #meadow-container {
             flex: 4; 
             position: relative;
-            background: linear-gradient(180deg, #e0f7fa 0%, #b2ebf2 100%);
-            border-bottom: 3px solid #ccc;
+            background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 35%, #81c784 75%, #66bb6a 100%);
+            border-bottom: 3px solid #8d6e63;
             padding: 10px;
             overflow: hidden;
             display: flex;
@@ -140,29 +113,29 @@
             padding: 8px 12px;
             font-size: 16px;
             cursor: pointer;
-            background: rgba(41, 182, 246, 0.8);
+            background: rgba(56, 142, 60, 0.85);
             color: white;
             border: none;
             border-radius: 5px;
             margin-left: 5px;
         }
-        .controls button:hover { background: #039be5; }
+        .controls button:hover { background: #2e7d32; }
         
-        #tank {
+        #meadow {
             flex: 1;
             position: relative;
             width: 100%;
             height: 100%;
         }
-        .fish {
+        .animal {
             position: absolute;
             font-size: 40px;
-            animation: swim 4s ease-in-out infinite alternate;
+            animation: hop 3s ease-in-out infinite alternate;
             transition: opacity 0.3s;
         }
-        @keyframes swim {
+        @keyframes hop {
             from { transform: translateX(0px) translateY(0px); }
-            to { transform: translateX(30px) translateY(-10px); }
+            to { transform: translateX(20px) translateY(-12px); }
         }
         
         #success-msg {
@@ -183,6 +156,7 @@
             text-align: center;
         }
 
+        /* 筆記區 */
         #whiteboard-container {
             flex: 6; 
             padding: 15px;
@@ -244,7 +218,7 @@
             display: block;
             border-radius: 8px;
             border: 1px solid #ccc;
-            pointer-events: none; 
+            pointer-events: none;
         }
         .image-board-container canvas {
             position: absolute;
@@ -263,103 +237,41 @@
     <!-- 左側：題目區 -->
     <div id="quiz-area">
         
-        <!-- Part 1 -->
+        <!-- Part 1: Grammar p14 (Unit 3-2) -->
         <div class="quiz-part active" id="part-1">
-            <div class="section-title">Part one: Word search</div>
-            <div style="font-size: 18px; margin-bottom: 10px; color: #555; line-height: 1.5;">
-                <strong>Words to find:</strong> BRIGHTLY, GROUND, SHINE, WEST, DAYTIME, NIGHTTIME, SONG, EAST, FIRECRACKER, NORTH, SANG, FROM, SET, SOUTH, STORY, TOLD
-            </div>
+            <div class="section-title">Grammar p14 (Unit 3-2)</div>
             <div class="toolbar">
                 <button id="btn-clear-p1">清除圖片上手寫</button>
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
             <div class="image-board-container">
-                <img src="01.jpg" alt="Word search" id="bg-img-p1">
+                <img src="image (12).png" onerror="if(!this.dataset.tried){this.dataset.tried=true;this.src='image (12).jpg';}" alt="Grammar p14" id="bg-img-p1">
                 <canvas id="part1Board"></canvas>
             </div>
         </div>
 
-        <!-- Part 2 -->
+        <!-- Part 2: Grammar p15 (純白板) -->
         <div class="quiz-part" id="part-2">
-            <div class="section-title">Part two: Reading p10</div>
-            <ol>
-                <li>I <input type="text" data-answer="went"> [wɛnt] swimming yesterday.</li>
-                <li>Don't <input type="text" data-answer="move"> [muv] the things on my table.</li>
-                <li>Which <input type="text" data-answer="side"> [saɪd] are you on?</li>
-                <li>Where does he come <input type="text" data-answer="from"> [frɑm]?</li>
-                <li>The sun rises in the <input type="text" data-answer="east"> [ist].</li>
-                <li>Sam <input type="text" data-answer="told"> [told] a story to me.</li>
-                <li>The children like to <input type="text" data-answer="set"> [sɛt] off firecrackers.</li>
-                <li>It fell to the <input type="text" data-answer="ground"> [graʊnd].</li>
-                <li>The sun was <input type="text" data-answer="shining"> [ʃaɪnɪŋ].</li>
-                <li>Babies sleep even in the <input type="text" data-answer="daytime"> [de.taɪm].</li>
-            </ol>
+            <div class="section-title">Grammar p15</div>
             <div class="toolbar">
-                <button id="btn-clear-p2">清除圖片上手寫</button>
+                <button id="btn-clear-p2">清除此區手寫</button>
+                <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
-            <div class="image-board-container">
-                <img src="04.jpg" alt="Reading p10" id="bg-img-p2">
+            <div class="canvas-wrapper" style="height: 520px; flex: none; margin-bottom: 20px;">
                 <canvas id="part2Board"></canvas>
             </div>
         </div>
 
-        <!-- Part 3 -->
+        <!-- Part 3: Grammar p15 (Unit 3-3) -->
         <div class="quiz-part" id="part-3">
-            <div class="section-title">Part three: Hamburger Paragraph</div>
+            <div class="section-title">Grammar p15 (Unit 3-3)</div>
             <div class="toolbar">
-                <button id="btn-clear-p3">清除此區手寫</button>
+                <button id="btn-clear-p3">清除圖片上手寫</button>
                 <span style="font-size: 16px; color: #666; margin-left: 10px;">(畫筆工具與顏色同右側設定)</span>
             </div>
-            <div class="canvas-wrapper" style="height: 450px; flex: none; margin-bottom: 20px;">
+            <div class="image-board-container">
+                <img src="image (13).png" onerror="if(!this.dataset.tried){this.dataset.tried=true;this.src='image (13).jpg';}" alt="Grammar p15" id="bg-img-p3">
                 <canvas id="part3Board"></canvas>
-            </div>
-        </div>
-
-        <!-- Part 4 -->
-        <div class="quiz-part" id="part-4">
-            <div class="section-title">Part four: Reading p11</div>
-            <p>短文寫作：寫一篇你和家人過中秋節的情景。</p>
-            <div class="toolbar">
-                <button id="btn-clear-p4">清除圖片上手寫</button>
-            </div>
-            <div class="image-board-container">
-                <img src="05.jpg" alt="Reading p11" id="bg-img-p4">
-                <canvas id="part4Board"></canvas>
-            </div>
-        </div>
-        
-        <!-- Part 5 -->
-        <div class="quiz-part" id="part-5">
-            <div class="section-title">Part five: Singular Nouns v.s. Plural Nouns</div>
-            <div class="toolbar">
-                <button id="btn-clear-p5">清除此區手寫</button>
-            </div>
-            <div class="canvas-wrapper" style="height: 450px; flex: none; margin-bottom: 20px;">
-                <canvas id="part5Board"></canvas>
-            </div>
-        </div>
-        
-        <!-- Part 6 -->
-        <div class="quiz-part" id="part-6">
-            <div class="section-title">Part six: Grammar p13</div>
-            <div class="toolbar">
-                <button id="btn-clear-p6">清除圖片上手寫</button>
-            </div>
-            <div class="image-board-container">
-                <img src="02.jpg" alt="Grammar p13" id="bg-img-p6">
-                <canvas id="part6Board"></canvas>
-            </div>
-        </div>
-
-        <!-- Part 7 -->
-        <div class="quiz-part" id="part-7">
-            <div class="section-title">Part seven: Grammar p14</div>
-            <div class="toolbar">
-                <button id="btn-clear-p7">清除圖片上手寫</button>
-            </div>
-            <div class="image-board-container">
-                <img src="03.jpg" alt="Grammar p14" id="bg-img-p7">
-                <canvas id="part7Board"></canvas>
             </div>
         </div>
 
@@ -370,14 +282,14 @@
         </div>
     </div>
 
-    <!-- 右側：魚缸與筆記區 -->
+    <!-- 右側：草皮與筆記區 -->
     <div id="side-area">
-        <div id="tank-container">
+        <div id="meadow-container">
             <div class="controls">
                 <button id="btn-add">+ 增加</button>
                 <button id="btn-sub">- 減少</button>
             </div>
-            <div id="tank"></div>
+            <div id="meadow"></div>
             <div id="success-msg">Finish!</div>
         </div>
 
@@ -447,7 +359,7 @@
                     draw(e);
                 }
 
-                function stopDrawing(e) {
+                function stopDrawing() {
                     isDrawing = false;
                     ctx.beginPath();
                 }
@@ -490,11 +402,11 @@
             }
 
             // 初始化所有畫布
-            const canvasIds = ['drawingBoard', 'part1Board', 'part2Board', 'part3Board', 'part4Board', 'part5Board', 'part6Board', 'part7Board'];
-            const clearBtnIds = ['btn-clear', 'btn-clear-p1', 'btn-clear-p2', 'btn-clear-p3', 'btn-clear-p4', 'btn-clear-p5', 'btn-clear-p6', 'btn-clear-p7'];
+            const canvasIds = ['drawingBoard', 'part1Board', 'part2Board', 'part3Board'];
+            const clearBtnIds = ['btn-clear', 'btn-clear-p1', 'btn-clear-p2', 'btn-clear-p3'];
             const canvases = [];
 
-            for(let i = 0; i < canvasIds.length; i++) {
+            for (let i = 0; i < canvasIds.length; i++) {
                 canvases.push(setupCanvas(canvasIds[i], clearBtnIds[i]));
             }
 
@@ -502,25 +414,39 @@
                 if (!canvas) return;
                 const rect = canvas.parentElement.getBoundingClientRect();
                 
-                if (rect.width > 0 && rect.height > 0 && (canvas.width !== rect.width || canvas.height !== rect.height)) {
+                if (rect.width > 0 && rect.height > 0 && (canvas.width !== Math.round(rect.width) || canvas.height !== Math.round(rect.height))) {
                     const tempCanvas = document.createElement('canvas');
                     tempCanvas.width = canvas.width || rect.width;
                     tempCanvas.height = canvas.height || rect.height;
                     
-                    if(canvas.width > 0 && canvas.height > 0) {
+                    if (canvas.width > 0 && canvas.height > 0) {
                         tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
                     }
                     
-                    canvas.width = rect.width;
-                    canvas.height = rect.height;
+                    canvas.width = Math.round(rect.width);
+                    canvas.height = Math.round(rect.height);
                     
-                    if(canvas.width > 0 && canvas.height > 0) {
+                    if (canvas.width > 0 && canvas.height > 0) {
                         canvas.getContext('2d').drawImage(tempCanvas, 0, 0);
                     }
                 }
             }
 
-            // 監聽視窗變化
+            // 使用 ResizeObserver 確保在 iPad 上圖片載入或切換分頁時畫布尺寸精準對齊
+            const resizeObserver = new ResizeObserver(() => {
+                canvases.forEach(c => {
+                    if (c && c.offsetParent !== null) {
+                        resizeCanvasSafe(c);
+                    }
+                });
+            });
+
+            canvases.forEach(c => {
+                if (c && c.parentElement) {
+                    resizeObserver.observe(c.parentElement);
+                }
+            });
+
             window.addEventListener('resize', () => {
                 canvases.forEach(c => {
                     if (c && c.offsetParent !== null) {
@@ -529,22 +455,10 @@
                 });
             });
 
-            // 確保圖片載入後正確重設畫布大小
-            const imgIds = ['bg-img-p1', 'bg-img-p2', 'bg-img-p4', 'bg-img-p6', 'bg-img-p7'];
-            imgIds.forEach(id => {
-                const img = document.getElementById(id);
-                if (img) {
-                    img.addEventListener('load', () => {
-                        canvases.forEach(c => {
-                            if (c && c.offsetParent !== null) {
-                                resizeCanvasSafe(c);
-                            }
-                        });
-                    });
-                }
-            });
-
-            setTimeout(() => { resizeCanvasSafe(canvases[0]); }, 100);
+            setTimeout(() => { 
+                resizeCanvasSafe(canvases[0]); 
+                resizeCanvasSafe(canvases[1]); 
+            }, 100);
 
             // --- 題目區切換邏輯 ---
             let currentPartIndex = 0;
@@ -556,7 +470,6 @@
                 parts.forEach((part, index) => {
                     if (index === currentPartIndex) {
                         part.classList.add('active');
-                        // 針對當前顯示的部分，重置其內部畫布尺寸
                         const activeCanvases = part.querySelectorAll('canvas');
                         activeCanvases.forEach(c => {
                             setTimeout(() => { resizeCanvasSafe(c); }, 50);
@@ -567,8 +480,6 @@
                 });
                 btnPrev.disabled = currentPartIndex === 0;
                 btnNext.disabled = currentPartIndex === parts.length - 1;
-                
-                // 切換區塊時自動滾回最上方
                 document.getElementById('quiz-area').scrollTop = 0;
             }
 
@@ -586,46 +497,45 @@
                 }
             });
 
-            // --- 魚缸區與作答邏輯 ---
-            let fishCount = 0;
-            const targetFish = 48; // 通關目標數量
-            const tank = document.getElementById('tank');
+            // --- 草皮與動物邏輯 ---
+            let animalCount = 0;
+            const targetAnimals = 36; // 集滿 36 隻動物過關
+            const meadow = document.getElementById('meadow');
             const successMsg = document.getElementById('success-msg');
             const btnAdd = document.getElementById('btn-add');
             const btnSub = document.getElementById('btn-sub');
             
-            // 20種海洋生物全圖鑑！(已打亂順序確保每次都有明顯不同的變化)
-            const fishEmojis = [
-                '🐟', '🐙', '🐢', '🦀', '🐠', 
-                '🐬', '🪼', '🦐', '🐳', '🐡', 
-                '🦑', '🦈', '🦭', '🦞', '🐋', 
-                '🪸', '🐚', '🫧', '🌿', '⭐'
+            // 20 種草地與陸地動物全圖鑑（依序出現，確保全部都會登場）
+            const animalEmojis = [
+                '🐶', '🐰', '🦊', '🐻', '🐼', 
+                '🐨', '🐯', '🦁', '🐮', '🐷', 
+                '🐸', '🐵', '🐔', '🦆', '🐑', 
+                '🐴', '🦄', '🦔', '🐿️', '🐱'
             ];
 
-            function updateTank() {
-                const currentFishes = tank.getElementsByClassName('fish').length;
+            function updateMeadow() {
+                const currentAnimals = meadow.getElementsByClassName('animal').length;
                 
-                if (currentFishes < fishCount) {
-                    for (let i = 0; i < (fishCount - currentFishes); i++) {
-                        const fish = document.createElement('span');
-                        fish.className = 'fish';
+                if (currentAnimals < animalCount) {
+                    for (let i = 0; i < (animalCount - currentAnimals); i++) {
+                        const animal = document.createElement('span');
+                        animal.className = 'animal';
                         
-                        // 【關鍵修改】：不再用隨機數，改用依序出現 (0 到 19 輪流)，確保 20 種一定全部出列
-                        const emojiIndex = (currentFishes + i) % fishEmojis.length;
-                        fish.innerText = fishEmojis[emojiIndex];
+                        const emojiIndex = (currentAnimals + i) % animalEmojis.length;
+                        animal.innerText = animalEmojis[emojiIndex];
                         
-                        fish.style.left = Math.random() * 85 + '%';
-                        fish.style.top = Math.random() * 80 + '%';
-                        if (Math.random() > 0.5) fish.style.transform = 'scaleX(-1)';
-                        tank.appendChild(fish);
+                        animal.style.left = Math.random() * 85 + '%';
+                        animal.style.top = Math.random() * 78 + '%';
+                        if (Math.random() > 0.5) animal.style.transform = 'scaleX(-1)';
+                        meadow.appendChild(animal);
                     }
-                } else if (currentFishes > fishCount) {
-                    for (let i = 0; i < (currentFishes - fishCount); i++) {
-                        if (tank.lastChild) tank.removeChild(tank.lastChild);
+                } else if (currentAnimals > animalCount) {
+                    for (let i = 0; i < (currentAnimals - animalCount); i++) {
+                        if (meadow.lastChild) meadow.removeChild(meadow.lastChild);
                     }
                 }
 
-                if (fishCount >= targetFish) {
+                if (animalCount >= targetAnimals) {
                     successMsg.style.display = 'block';
                 } else {
                     successMsg.style.display = 'none';
@@ -633,27 +543,14 @@
             }
 
             btnAdd.addEventListener('click', () => {
-                fishCount++;
-                updateTank();
+                animalCount++;
+                updateMeadow();
             });
 
             btnSub.addEventListener('click', () => {
-                if (fishCount > 0) {
-                    fishCount--;
-                    updateTank();
-                }
-            });
-
-            document.getElementById('quiz-area').addEventListener('input', function(e) {
-                if (e.target.tagName === 'INPUT' && e.target.type === 'text') {
-                    const expected = (e.target.getAttribute('data-answer') || "").toLowerCase().trim();
-                    const actual = e.target.value.toLowerCase().trim();
-                    
-                    if (actual === expected && !e.target.disabled) {
-                        e.target.disabled = true; 
-                        fishCount++;
-                        updateTank();
-                    }
+                if (animalCount > 0) {
+                    animalCount--;
+                    updateMeadow();
                 }
             });
             
